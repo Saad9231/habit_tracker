@@ -1,0 +1,28 @@
+{
+  "name": "habit-cost-handler",
+  "version": "1.0.0",
+  "description": "Track daily habit costs and hostel supplies with MongoDB backend",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "keywords": [
+    "habits",
+    "finance",
+    "supply-tracker",
+    "mongodb"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

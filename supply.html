@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Supply Tracker" />
+    <link rel="manifest" href="./manifest.json" />
+    <title>Hostel Supply Tracker — Predict Your Refill Dates</title>
+    <meta name="description" content="Track your hostel supplies like flour, rice, oil. Predict when to refill and manage monthly expenses smartly." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="./src/css/style.css" />
+    <link rel="stylesheet" href="./src/css/supply.css" />
+</head>
+
+<body>
+
+    <!-- Background orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ── NAV ── -->
+    <nav class="site-nav">
+        <a href="index.html" class="nav-link">💸 Habit Cost</a>
+        <a href="supply.html" class="nav-link active">🏠 Supply Tracker</a>
+    </nav>
+
+    <!-- ── HEADER ── -->
+    <header class="site-header">
+        <div class="header-top">
+            <span class="header-badge" id="userNameDisplay">Welcome</span>
+            <select id="currency-select" class="currency-select" aria-label="Select Currency">
+                <option value="PKR">🇵🇰 PKR (₨)</option>
+                <option value="USD">🇺🇸 USD ($)</option>
+                <option value="EUR">🇪🇺 EUR (€)</option>
+                <option value="GBP">🇬🇧 GBP (£)</option>
+                <option value="INR">🇮🇳 INR (₹)</option>
+                <option value="CNY">🇨🇳 CNY (¥)</option>
+            </select>
+            <button id="audio-toggle" class="audio-toggle" aria-label="Toggle sound">🔊</button>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            <button id="logoutBtn" class="theme-toggle" aria-label="Logout" style="font-size: 0.9rem;">🚪</button>
+        </div>
+        <h1 class="site-title">Hostel<br /><em>Supply Tracker</em></h1>
+        <p class="site-subtitle">
+            Track your supplies, predict refill dates,<br />
+            and manage your monthly expenses smartly.
+        </p>
+    </header>
+
+    <!-- ── MAIN ── -->
+    <main class="supply-main">
+
+        <!-- Settings Bar -->
+        <section class="supply-settings" id="supply-settings">
+            <div class="setting-item roommate-setting">
+                <label>👥 Shared by</label>
+                <div class="roommates-list" id="roommates-list">
+                    <!-- Rendered by JS -->
+                </div>
+                <form class="add-roommate-form" id="add-roommate-form">
+                    <input type="text" id="new-roommate-name" placeholder="+ Add Person" autocomplete="off" maxlength="15" />
+                    <button type="submit" hidden>Add</button>
+                </form>
+            </div>
+            <div class="setting-item">
+                <label>🔔 Notifications</label>
+                <button class="notification-toggle" id="notification-toggle" type="button">
+                    <span class="notif-status" id="notif-status">Enable</span>
+                </button>
+            </div>
+            <div class="setting-item budget-setting">
+                <label>💰 Monthly Budget</label>
+                <input type="number" id="budget-input" placeholder="50000" step="1000" class="budget-input-field" />
+            </div>
+            <div class="setting-item action-buttons">
+                <button class="btn-calculate btn-export" id="btn-export-csv" type="button">
+                    📊 CSV
+                </button>
+                <button class="btn-calculate btn-export btn-pdf" id="btn-export-pdf" type="button">
+                    📄 PDF
+                </button>
+            </div>
+        </section>
+
+        <!-- Alerts Section (low supply warnings) -->
+        <div class="alerts-container" id="alerts-container">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- Active Supplies -->
+        <section class="supply-section" id="active-section">
+            <div class="section-label">📦 Active Supplies</div>
+            <div class="supply-grid" id="supply-grid">
+                <!-- Rendered by JS -->
+            </div>
+            <button class="btn-add-supply" id="btn-add-supply" type="button">
+                <span class="add-icon">+</span>
+                <span>Add Supply</span>
+            </button>
+        </section>
+
+        <!-- One-Time Bills -->
+        <section class="supply-section" id="bills-section">
+            <div class="section-label">💸 One-Time Bills</div>
+            <div class="supply-grid" id="bills-grid">
+                <!-- Rendered by JS -->
+            </div>
+            <button class="btn-add-supply" id="btn-add-bill" type="button" style="background: rgba(168, 212, 184, 0.2); color: var(--moss); border-color: var(--moss);">
+                <span class="add-icon">+</span>
+                <span>Add Bill</span>
+            </button>
+        </section>
+
+        <!-- Monthly Summary -->
+        <section class="supply-section" id="summary-section">
+            <div class="section-label" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>📊 Monthly Summary</span>
+                <select id="archive-month-select" class="currency-select" style="margin:0; width:auto; font-size:0.8rem; padding:4px 8px;">
+                    <option value="current">Current (Predicted)</option>
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+            <div class="summary-cards" id="summary-cards">
+                <!-- Rendered by JS -->
+            </div>
+            <div class="chart-container" style="margin-top:24px; display:none;" id="chart-container">
+                <canvas id="summaryChart" height="250"></canvas>
+            </div>
+            
+            <div id="settlement-dashboard" style="margin-top: 24px;">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+        <!-- Refill Timeline -->
+        <section class="supply-section" id="timeline-section">
+            <div class="section-label">📅 Upcoming Refills</div>
+            <div class="timeline-container" id="timeline-container">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+        <!-- Purchase History -->
+        <section class="supply-section" id="history-section">
+            <div class="section-label">📜 Purchase History</div>
+            <div class="history-list" id="history-list">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer">
+        <p>Track smart, spend wisely 🏠 → 💰</p>
+        <p class="footer-note">Predictions improve as you log more purchases.</p>
+    </footer>
+
+    <!-- Add Supply Modal -->
+    <dialog id="supply-modal" class="modal supply-modal">
+        <form class="modal-form" id="supply-form" method="dialog">
+            <h2>Add Supply</h2>
+
+            <!-- Preset quick-picks -->
+            <div class="preset-label">Quick Pick:</div>
+            <div class="preset-grid" id="preset-grid">
+                <button type="button" class="preset-chip" data-key="flour" data-name="Flour (Atta)" data-emoji="🌾" data-unit="kg">🌾 Flour</button>
+                <button type="button" class="preset-chip" data-key="rice" data-name="Rice (Chawal)" data-emoji="🍚" data-unit="kg">🍚 Rice</button>
+                <button type="button" class="preset-chip" data-key="oil" data-name="Cooking Oil" data-emoji="🛢️" data-unit="litre">🛢️ Oil</button>
+                <button type="button" class="preset-chip" data-key="lentils" data-name="Lentils (Daal)" data-emoji="🫘" data-unit="kg">🫘 Daal</button>
+                <button type="button" class="preset-chip" data-key="onions" data-name="Onions" data-emoji="🧅" data-unit="kg">🧅 Onions</button>
+                <button type="button" class="preset-chip" data-key="potatoes" data-name="Potatoes" data-emoji="🥔" data-unit="kg">🥔 Potatoes</button>
+                <button type="button" class="preset-chip" data-key="tea" data-name="Tea / Chai" data-emoji="🫖" data-unit="pack">🫖 Chai</button>
+                <button type="button" class="preset-chip" data-key="milk" data-name="Milk" data-emoji="🥛" data-unit="litre">🥛 Milk</button>
+                <button type="button" class="preset-chip" data-key="sugar" data-name="Sugar" data-emoji="🍬" data-unit="kg">🍬 Sugar</button>
+                <button type="button" class="preset-chip" data-key="spices" data-name="Spices" data-emoji="🧂" data-unit="pack">🧂 Spices</button>
+            </div>
+
+            <div class="modal-divider">
+                <span>or enter custom item</span>
+            </div>
+
+            <div class="modal-grid">
+                <div class="input-group">
+                    <label for="supply-name">Item Name *</label>
+                    <input type="text" id="supply-name" placeholder="e.g. Flour, Rice" required autocomplete="off" />
+                </div>
+                <div class="input-group">
+                    <label for="supply-emoji">Emoji</label>
+                    <input type="text" id="supply-emoji" placeholder="🌾" maxlength="2" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="modal-grid modal-grid-3">
+                <div class="input-group">
+                    <label for="supply-qty">Quantity *</label>
+                    <input type="number" id="supply-qty" placeholder="10" min="0.1" step="0.1" required autocomplete="off" />
+                </div>
+                <div class="input-group">
+                    <label for="supply-unit">Unit</label>
+                    <select id="supply-unit" class="currency-select" style="width:100%;border-radius:var(--radius-sm)">
+                        <option value="kg">kg</option>
+                        <option value="litre">litre</option>
+                        <option value="pack">pack</option>
+                        <option value="unit">unit</option>
+                        <option value="dozen">dozen</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="supply-price">Total Price *</label>
+                    <input type="number" id="supply-price" placeholder="1200" min="0" step="1" required autocomplete="off" />
+                    <span class="input-hint">For the whole quantity</span>
+                </div>
+            </div>
+
+            <div class="input-row" style="margin-top: 16px;">
+                <div class="input-group" style="flex: 1;">
+                    <label for="supply-date">Purchase Date *</label>
+                    <input type="date" id="supply-date" required />
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label for="supply-paid-by">Paid By *</label>
+                    <select id="supply-paid-by" class="currency-select" style="width:100%; border-radius:var(--radius-sm)">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- 🧠 Smart Usage Calculator -->
+            <div class="smart-usage-section" id="smart-usage-section">
+                <div class="smart-usage-header">
+                    <span class="smart-icon">🧠</span>
+                    <span>Smart Usage Calculator</span>
+                </div>
+                <div class="smart-usage-body" id="smart-usage-body">
+                    <!-- Default: manual entry for custom items -->
+                    <div class="input-group">
+                        <label for="supply-smart-input" id="smart-input-label">Daily usage (in unit/day)</label>
+                        <input type="number" id="supply-smart-input" placeholder="0.5" min="0.01" step="0.01" autocomplete="off" />
+                        <span class="input-hint" id="smart-hint">per person per day</span>
+                    </div>
+                </div>
+                <div class="smart-result" id="smart-result" hidden>
+                    <!-- Auto-calculated result shown here -->
+                </div>
+            </div>
+
+            <!-- Hidden: final computed daily rate -->
+            <input type="hidden" id="supply-rate" value="" />
+
+            <div class="cta-row" style="margin-top: 24px;">
+                <button type="submit" class="btn-calculate" style="padding: 12px 24px;">Add Supply</button>
+                <button type="button" class="btn-reset" id="btn-close-supply-modal">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Add Bill Modal -->
+    <dialog id="bill-modal" class="modal supply-modal">
+        <form class="modal-form" id="bill-form" method="dialog">
+            <h2>Add One-Time Bill</h2>
+            
+            <!-- Preset quick-picks for bills -->
+            <div class="preset-label">Quick Pick:</div>
+            <div class="preset-grid" id="bill-preset-grid" style="margin-bottom: 24px;">
+                <button type="button" class="preset-chip" data-name="Electricity Bill" data-emoji="⚡">⚡ Electricity</button>
+                <button type="button" class="preset-chip" data-name="Maid / Cook" data-emoji="🧹">🧹 Maid/Cook</button>
+                <button type="button" class="preset-chip" data-name="Gas Cylinder" data-emoji="🔥">🔥 Gas</button>
+                <button type="button" class="preset-chip" data-name="Water Dispenser" data-emoji="💧">💧 Water</button>
+                <button type="button" class="preset-chip" data-name="Wifi / Internet" data-emoji="🌐">🌐 Wifi</button>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group" style="flex: 2;">
+                    <label for="bill-name">Bill Name *</label>
+                    <input type="text" id="bill-name" placeholder="Electricity Bill" required autocomplete="off" />
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label for="bill-emoji">Emoji</label>
+                    <input type="text" id="bill-emoji" placeholder="⚡" maxlength="2" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="input-row" style="margin-top: 16px;">
+                <div class="input-group">
+                    <label for="bill-price">Total Amount *</label>
+                    <input type="number" id="bill-price" placeholder="5000" min="0" step="1" required autocomplete="off" />
+                </div>
+                <div class="input-group">
+                    <label for="bill-date">Date paid *</label>
+                    <input type="date" id="bill-date" required />
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top: 16px;">
+                <label for="bill-paid-by">Paid By *</label>
+                <select id="bill-paid-by" class="currency-select" style="width:100%; border-radius:var(--radius-sm)">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <div class="cta-row" style="margin-top: 24px;">
+                <button type="submit" class="btn-calculate" style="padding: 12px 24px;">Add Bill</button>
+                <button type="button" class="btn-reset" id="btn-close-bill-modal">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="alert" aria-live="assertive" hidden></div>
+
+    <!-- Back to top -->
+    <button id="btn-back-to-top" class="btn-back-to-top" aria-label="Back to top">↑</button>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF & autoTable for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
+    </script>
+    <script type="module" src="./src/js/supplyMain.js"></script>
+</body>
+
+</html>

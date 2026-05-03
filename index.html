@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Habit Cost" />
+    <link rel="manifest" href="./manifest.json" />
+    <title>Real Cost of Habits — See How Much Your Daily Habits Really Cost</title>
+    <meta name="description"
+        content="Discover how much your daily habits like coffee, eating out, and subscriptions really cost you over time. Calculate the true price and see what you could buy instead." />
+    <meta property="og:title" content="The Real Cost of Your Habits" />
+    <meta property="og:description"
+        content="Small daily habits quietly cost you thousands. Find out exactly how much." />
+    <meta property="og:type" content="website" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="./src/css/style.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Background orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ── NAV ── -->
+    <nav class="site-nav">
+        <a href="index.html" class="nav-link active">💸 Habit Cost</a>
+        <a href="supply.html" class="nav-link">🏠 Supply Tracker</a>
+    </nav>
+
+    <!-- ── HEADER ── -->
+    <header class="site-header">
+        <div class="header-top">
+            <span id="userNameDisplay" class="header-badge">Welcome</span>
+            <div class="header-badge">💸 Habit Audit</div>
+            <select id="currency-select" class="currency-select" aria-label="Select Currency">
+                <option value="PKR" selected>🇵🇰 PKR (₨)</option>
+                <option value="USD">🇺🇸 USD ($)</option>
+                <option value="EUR">🇪🇺 EUR (€)</option>
+                <option value="GBP">🇬🇧 GBP (£)</option>
+                <option value="INR">🇮🇳 INR (₹)</option>
+                <option value="CNY">🇨🇳 CNY (¥)</option>
+            </select>
+            <button id="audio-toggle" class="audio-toggle" aria-label="Toggle sound">🔊</button>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            <button id="logoutBtn" class="theme-toggle" aria-label="Logout">🚪</button>
+        </div>
+        <h1 class="site-title">The Real Cost of<br /><em>Your Habits</em></h1>
+        <p class="site-subtitle">
+            Small daily habits quietly cost you <strong>thousands</strong>.<br />
+            Find out exactly how much.
+        </p>
+        <div class="warning-banner">
+            <span class="warning-icon">⚠️</span>
+            <span>Small habits become big costs — and bigger regrets.</span>
+        </div>
+    </header>
+
+    <!-- ── MAIN ── -->
+    <main>
+
+        <!-- Calculator Section -->
+        <section class="calculator-section" id="calculator">
+            <div class="section-label">Step 1 — Enter Your Habits</div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">0 of 8 habits filled</div>
+            </div>
+
+            <form id="habit-form" novalidate>
+                <div class="habits-grid" id="habits-grid">
+                    <!-- HabitCard.js renders cards here -->
+                </div>
+            </form>
+
+            <div class="cta-row">
+                <button class="btn-calculate" id="btn-calculate" type="button">
+                    <span>Calculate My Cost</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        aria-hidden="true">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </button>
+                <button class="btn-reset" id="btn-reset" type="button">↺ Reset</button>
+            </div>
+
+            <div class="keyboard-hint">
+                <kbd>Enter</kbd> to calculate · <kbd>Esc</kbd> to close modal
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="results" aria-live="polite">
+            <div class="section-label">Step 2 — Your Hidden Price Tag</div>
+
+            <!-- Biggest expense banner -->
+            <div id="biggest-expense-banner" class="biggest-expense-banner" hidden></div>
+
+            <!-- Share Actions -->
+            <div class="share-row">
+                <span class="share-label">📤 Share Results</span>
+                <button class="share-btn" data-share="copy" title="Copy to clipboard">
+                    📋 Copy
+                </button>
+                <button class="share-btn share-btn-whatsapp" data-share="whatsapp" title="Share on WhatsApp">
+                    💬 WhatsApp
+                </button>
+            </div>
+
+            <!-- Visualization Section -->
+            <div class="results-label">📈 Cost Visualization</div>
+            <div class="chart-container"
+                style="position: relative; height:300px; width:100%; margin-bottom: 40px; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px;">
+                <canvas id="cost-chart"></canvas>
+            </div>
+
+            <!-- Money over time -->
+            <div class="results-label">💰 Money Over Time</div>
+            <div class="results-grid money-grid" id="money-grid">
+                <!-- ResultsPanel.js renders here -->
+            </div>
+
+            <!-- Per-habit breakdown -->
+            <div class="results-label">📊 Breakdown by Habit</div>
+            <div class="breakdown-list" id="breakdown-list">
+                <!-- BreakdownList.js renders here -->
+            </div>
+
+            <!-- Time metrics -->
+            <div id="time-section">
+                <div class="results-label">⏱️ Time You'll Never Get Back</div>
+                <div class="results-grid time-grid" id="time-grid">
+                    <!-- ResultsPanel.js renders here -->
+                </div>
+            </div>
+
+            <!-- Comparison -->
+            <div class="results-label">🛒 What You Could Have Instead</div>
+            <div class="comparison-grid" id="comparison-grid">
+                <!-- ComparisonGrid.js renders here -->
+            </div>
+
+            <!-- Motivational Tip -->
+            <div id="motivational-tip" class="motivational-tip-container">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer">
+        <p>Built to make you think twice ☕ → 💰</p>
+        <p class="footer-note">Numbers are estimates based on your inputs. Invest wisely.</p>
+    </footer>
+
+    <!-- Add Custom Habit Modal -->
+    <dialog id="custom-habit-modal" class="modal">
+        <form class="modal-form" id="custom-habit-form" method="dialog">
+            <h2>Add Custom Habit</h2>
+            <div class="input-group">
+                <label for="custom-name">Habit Name</label>
+                <input type="text" id="custom-name" placeholder="e.g. Netflix, Gym" required autocomplete="off" />
+            </div>
+            <div class="input-group" style="margin-top: 16px;">
+                <label for="custom-emoji">Emoji (Optional)</label>
+                <input type="text" id="custom-emoji" placeholder="📺" maxlength="2" autocomplete="off" />
+            </div>
+            <div class="input-group" style="margin-top: 16px;">
+                <label for="custom-freq">Frequency</label>
+                <select id="custom-freq" class="currency-select" style="width: 100%; border-radius: var(--radius-sm)">
+                    <option value="day">per day</option>
+                    <option value="week">per week</option>
+                    <option value="month" selected>per month</option>
+                </select>
+            </div>
+            <div class="cta-row" style="margin-top: 24px;">
+                <button type="submit" class="btn-calculate" style="padding: 12px 24px;">Add Habit</button>
+                <button type="button" class="btn-reset" id="btn-close-modal">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="alert" aria-live="assertive" hidden></div>
+
+    <!-- Sticky Calculate Button (mobile) -->
+    <button id="sticky-calculate" class="sticky-calculate" aria-label="Calculate My Cost">
+        Calculate My Cost →
+    </button>
+
+    <!-- Back to top button -->
+    <button id="btn-back-to-top" class="btn-back-to-top" aria-label="Back to top">↑</button>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => { });
+        }
+    </script>
+    <script type="module" src="./src/js/main.js"></script>
+</body>
+
+</html>
