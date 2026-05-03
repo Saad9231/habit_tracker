@@ -7,11 +7,13 @@
 
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const HabitData = require('../models/HabitData');
 const auth = require('../middleware/auth');
 
 // ── GET — Fetch habit data ──────────────────────────────────
 router.get('/', auth, async (req, res) => {
+    if (mongoose.connection.readyState !== 1) return res.status(503).json({ success: false, message: 'DB Offline' });
     try {
         const data = await HabitData.findOne({ userId: req.user.id });
         if (!data) {
@@ -26,6 +28,7 @@ router.get('/', auth, async (req, res) => {
 
 // ── PUT — Save/update habit data ────────────────────────────
 router.put('/', auth, async (req, res) => {
+    if (mongoose.connection.readyState !== 1) return res.status(503).json({ success: false, message: 'DB Offline' });
     try {
         const { currency, formData, customHabits } = req.body;
 
@@ -48,6 +51,7 @@ router.put('/', auth, async (req, res) => {
 
 // ── DELETE — Clear all habit data ───────────────────────────
 router.delete('/', auth, async (req, res) => {
+    if (mongoose.connection.readyState !== 1) return res.status(503).json({ success: false, message: 'DB Offline' });
     try {
         await HabitData.deleteOne({ userId: req.user.id });
         res.json({ success: true, message: 'Habit data cleared' });

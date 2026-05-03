@@ -5,8 +5,17 @@
 
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const SupplyData = require('../models/SupplyData');
 const auth = require('../middleware/auth');
+
+// ── Middleware — Check DB Connection ────────────────────────
+router.use((req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({ success: false, message: 'DB Offline' });
+    }
+    next();
+});
 
 // ── Helper — get or create document ─────────────────────────
 async function getOrCreate(userId) {
