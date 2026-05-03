@@ -44,14 +44,18 @@ mongoose.connect(MONGO_URI)
     .then(() => {
         console.log('✅ MongoDB connected successfully');
         console.log(`   Database: ${mongoose.connection.name}`);
-        startServer();
+        if (process.env.NODE_ENV !== 'production') {
+            startServer();
+        }
     })
     .catch(err => {
         console.error('❌ MongoDB connection failed:', err.message);
         console.error('\n⚠️ NETWORK FIREWALL DETECTED:');
         console.error("   Your current network is blocking connections to MongoDB Atlas (Port 27017).");
         console.error("   Starting server in OFFLINE MODE. The app will use your browser's local storage instead.\\n");
-        startServer();
+        if (process.env.NODE_ENV !== 'production') {
+            startServer();
+        }
     });
 
 function startServer() {
@@ -69,3 +73,6 @@ process.on('SIGINT', async () => {
     console.log('\n🔌 MongoDB disconnected. Server stopped.');
     process.exit(0);
 });
+
+// Export the app for Vercel Serverless execution
+module.exports = app;
