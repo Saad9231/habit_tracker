@@ -154,6 +154,7 @@ function applyLoadedData(data) {
 
     updateHabitState();
     renderHabitCards(habitGrid, allHabits);
+    triggerEntranceAnimations();
 
     if (data.formData) {
         Object.entries(data.formData).forEach(([id, val]) => {
@@ -202,6 +203,7 @@ if (currencySelect.value !== savedCurrency) {
 
 updateHabitState();
 renderHabitCards(habitGrid, allHabits);
+triggerEntranceAnimations();
 
 // First load from localStorage (instant), then try MongoDB (async)
 const hasLocalData = loadFromLocalStorage();
